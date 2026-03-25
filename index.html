@@ -143,6 +143,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent-bd); back
 .s-writing       { background: var(--blue-bg);               border-color: var(--blue-bd);                color: #3d6e9e; }
 .s-data_extraction { background: rgba(217,119,87,0.1);       border-color: rgba(217,119,87,0.3);          color: #a0522d; }
 .s-published     { background: rgba(20,20,19,0.06);          border-color: rgba(20,20,19,0.18);           color: var(--t3); }
+.s-conception    { background: rgba(176,174,165,0.15); border-color: rgba(176,174,165,0.4); color: #6b6960; }
 .s-screening     { background: rgba(120,140,93,0.1);         border-color: rgba(120,140,93,0.3);          color: #4a5e35; }
 
 /* ── VIEW TOGGLE ── */
@@ -326,6 +327,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent-bd); back
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-active">0</div><div class="hdr-stat-l">Active</div></div>
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-total">0</div><div class="hdr-stat-l">Total</div></div>
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-collabs">0</div><div class="hdr-stat-l">People</div></div>
+    <div class="hdr-stat"><div class="hdr-stat-n" id="stat-pending">0</div><div class="hdr-stat-l">Pending</div></div>
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-slots">0</div><div class="hdr-stat-l">Open Slots</div></div>
   </div>
   <div class="hdr-actions">
@@ -396,6 +398,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent-bd); back
       </div>
       <div class="fg"><div class="lbl">Status</div>
         <select id="p-status">
+          <option value="conception">Conception</option>
           <option value="writing">Writing</option>
           <option value="screening">Screening</option>
           <option value="data_extraction">Data Extraction</option>
@@ -538,6 +541,7 @@ const PROJ_KEY     = 'rc_projects_v6';
 const PEOPLE_KEY   = 'rc_people_v6';
 const PIPELINE_KEY = 'rc_pipeline_v3';
 const STATUS_META = {
+  conception:     { label:'Conception',      cls:'s-conception' },
   writing:        { label:'Writing',         cls:'s-writing' },
   screening:      { label:'Screening',       cls:'s-screening' },
   data_extraction:{ label:'Data Extraction', cls:'s-data_extraction' },
@@ -546,11 +550,11 @@ const STATUS_META = {
   published:      { label:'Published',       cls:'s-published' },
 };
 const TYPE_META = {
-  systematic_review:   { icon:'◈', label:'Systematic Review',   color:'#3d6e9e', bg:'rgba(106,155,204,0.12)', bd:'rgba(106,155,204,0.32)' },
+  systematic_review:   { icon:'◈', label:'Systematic Review',   color:'#a0522d', bg:'rgba(217,119,87,0.14)',  bd:'rgba(217,119,87,0.35)'  },
   narrative_review:    { icon:'◇', label:'Narrative Review',    color:'#4a5e35', bg:'rgba(120,140,93,0.12)',  bd:'rgba(120,140,93,0.32)'  },
   original_research:   { icon:'◆', label:'Original Research',   color:'#a0522d', bg:'rgba(217,119,87,0.12)', bd:'rgba(217,119,87,0.32)'  },
   case_report:         { icon:'◉', label:'Case Report',         color:'#7a6030', bg:'rgba(180,140,60,0.12)', bd:'rgba(180,140,60,0.32)'  },
-  conference_poster:   { icon:'⬆', label:'Conference Poster',   color:'#3d6e9e', bg:'rgba(106,155,204,0.08)', bd:'rgba(106,155,204,0.25)' },
+  conference_poster:   { icon:'⬆', label:'Conference Poster',   color:'#4a5e35', bg:'rgba(120,140,93,0.12)',  bd:'rgba(120,140,93,0.30)'  },
   conference_abstract: { icon:'■', label:'Conference Abstract', color:'#6b6960', bg:'rgba(176,174,165,0.15)', bd:'rgba(176,174,165,0.35)' },
   protocol:            { icon:'☍', label:'Protocol',            color:'#a0522d', bg:'rgba(217,119,87,0.08)', bd:'rgba(217,119,87,0.25)'  },
 };
@@ -603,6 +607,7 @@ function renderStats(){
   document.getElementById('stat-active').textContent  = activeProjects().length;
   document.getElementById('stat-total').textContent   = projects.length;
   document.getElementById('stat-collabs').textContent = people.length;
+  document.getElementById('stat-pending').textContent = people.filter(p=>personStatus(p.id)==='pending').length;
   document.getElementById('stat-slots').textContent   = activeProjects().reduce((a,p)=>a+Math.max(0,p.capacity-p.team.length),0);
 }
 
@@ -653,6 +658,7 @@ function renderPriorityView(ap, q){
           <button class="reorder-btn" style="${downDis}" ${globalIdx===ap.length-1?'disabled':''} onclick="moveProjGlobal('${proj.id}',1)" title="Lower priority">↓</button>
         </div>
         <div class="kc-actions" style="flex-direction:column;">
+          <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Return to pipeline" onclick="returnToPipeline('${proj.id}')">↩</button>
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${proj.id}')">✎</button>
           <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${proj.id}')">×</button>
         </div>
@@ -685,6 +691,7 @@ function renderProjPills(){
 function setProjFilter(f){projFilter=f;renderProjects();}
 
 const KANBAN_COLS = [
+  {key:'conception',     label:'Conception',       color:'#6b6960', bg:'rgba(176,174,165,0.1)'},
   {key:'writing',        label:'Writing',          color:'#3d6e9e', bg:'rgba(106,155,204,0.08)'},
   {key:'screening',      label:'Screening',        color:'#7a6030', bg:'rgba(180,140,60,0.08)'},
   {key:'data_extraction',label:'Data Extraction',  color:'#a0522d', bg:'rgba(217,119,87,0.08)'},
@@ -722,6 +729,7 @@ function buildKanbanCard(proj,idx,total){
       <div style="display:flex;align-items:center;gap:6px;">
         ${slotPill}
         <div class="kc-actions">
+          <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Return to pipeline" onclick="returnToPipeline('${proj.id}')">↩</button>
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${proj.id}')">✎</button>
           <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${proj.id}')">×</button>
         </div>
@@ -848,7 +856,7 @@ function renderPeople(){
   const filtered=sortPeople(people.filter(p=>{
     const st=personStatus(p.id);
     if(peopleFilter!=='all'&&st!==peopleFilter)return false;
-    if(q&&!p.name.toLowerCase().includes(q)&&!(p.institution||'').toLowerCase().includes(q))return false;
+    if(q){const _hay=[p.name,p.institution||'',...(p.specialties||[]),...(p.interests||[])].join(' ').toLowerCase();if(!_hay.includes(q))return false;}
     return true;
   }));
   if(!filtered.length){
@@ -1200,7 +1208,25 @@ function promotePipeline(id){
   document.getElementById('mProj')._fromPipeline=id;
 }
 
+function returnToPipeline(projId){
+  const proj=projects.find(p=>p.id===projId);if(!proj)return;
+  if(!confirm('Return this project to the pipeline?'))return;
+  pipeline.push({id:'pl'+Date.now(),title:proj.title,area:(proj.tags||[])[0]||'',priority:'medium',contactId:'',contact:'',followUp:'',notes:proj.notes||'',addedDate:new Date().toISOString().slice(0,10)});
+  projects=projects.filter(p=>p.id!==projId);
+  savePipeline_();saveProjects();
+  if(!pipelineOpenState) togglePipeline();
+  renderAll();
+}
 function renderAll(){renderStats();renderProjects();renderPeople();renderPipeline();}
+function returnToPipeline(projId){
+  const proj=projects.find(p=>p.id===projId);if(!proj)return;
+  if(!confirm('Return this project to the pipeline?'))return;
+  pipeline.push({id:'pl'+Date.now(),title:proj.title,area:(proj.tags||[])[0]||'',priority:'medium',contactId:'',contact:'',followUp:'',notes:proj.notes||'',addedDate:new Date().toISOString().slice(0,10)});
+  projects=projects.filter(p=>p.id!==projId);
+  savePipeline_();saveProjects();
+  if(!pipelineOpenState) togglePipeline();
+  renderAll();
+}
 function renderAll(){renderStats();renderProjects();renderPeople();renderPipeline();}
 renderAll();
 </script>

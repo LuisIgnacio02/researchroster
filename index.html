@@ -566,7 +566,7 @@ let people   = JSON.parse(localStorage.getItem(PEOPLE_KEY)||'null')||[{"id": "pe
 let projFilter='all', peopleFilter='all', archivedOpen=false, tagStates={}, currentView='kanban', pipelineOpen=false;
 function saveProjects(){ localStorage.setItem(PROJ_KEY,JSON.stringify(projects)); }
 function savePeople(){   localStorage.setItem(PEOPLE_KEY,JSON.stringify(people)); }
-let pipeline = JSON.parse(localStorage.getItem(PIPELINE_KEY)||'null')||[];
+let pipeline = JSON.parse(localStorage.getItem(PIPELINE_KEY)||'null')||[{"id": "pl1774154501432", "title": "Lupus-induced chorea case report", "area": "Neurology", "priority": "medium", "contactId": "per1774140738120", "contact": "Daniel Martínez-Ramírez", "followUp": "2026-03-23", "notes": "Regarding Yara Jhonson Contreras' case", "addedDate": "2026-03-22"}, {"id": "pl1774156637861", "title": "Advanced age Parkinson disease phenotype", "area": "Neurology", "priority": "medium", "contactId": "per1774140738120", "contact": "Daniel Martínez-Ramírez", "followUp": "2026-04-04", "notes": "Regarding patients above 70 years of age with less than 3 years of evolution", "addedDate": "2026-03-22"}, {"id": "pl1774156929287", "title": "Dysautonomia with obstructive sleep apnea in Parkinson disease", "area": "Neurology", "priority": "low", "contactId": "per1774140738120", "contact": "Daniel Martínez-Ramírez", "followUp": "2026-04-04", "notes": "", "addedDate": "2026-03-22"}, {"id": "pl1774156956931", "title": "Walter's thesis", "area": "Geriatrics", "priority": "low", "contactId": "", "contact": "", "followUp": "2026-06-06", "notes": "", "addedDate": "2026-03-22"}, {"id": "pl1774156988127", "title": "Kenji's projects", "area": "Neurology", "priority": "low", "contactId": "", "contact": "", "followUp": "2026-04-04", "notes": "", "addedDate": "2026-03-22"}, {"id": "pl1774398377437", "title": "DaT scan concentration project", "area": "Neurology", "priority": "high", "contactId": "per1774140754158", "contact": "Erick Barajas", "followUp": "2026-03-26", "notes": "", "addedDate": "2026-03-25"}, {"id": "pl1774475179512", "title": "Revive ADHD review", "area": "Neurology", "priority": "low", "contactId": "", "contact": "", "followUp": "2026-04-05", "notes": "", "addedDate": "2026-03-25"}, {"id": "pl1774475213036", "title": "Spectroscopy review", "area": "Radiology", "priority": "low", "contactId": "per1774141067614", "contact": "Guillermo Andrés Negrete-Gómez", "followUp": "2026-04-26", "notes": "", "addedDate": "2026-03-25"}];
 function savePipeline_(){ localStorage.setItem(PIPELINE_KEY,JSON.stringify(pipeline)); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function initials(n){ return (n||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
@@ -1098,8 +1098,9 @@ function removeTag(fid,val){if(!tagStates[fid])return;tagStates[fid]=tagStates[f
 function getTagsFromInput(fid){return tagStates[fid]||[];}
 
 function exportAll(){
-  const b=new Blob([JSON.stringify({exported:new Date().toISOString(),projects,people},null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`research-roster-${new Date().toISOString().slice(0,10)}.json`;a.click();
+  const data={exported:new Date().toISOString(),projects,people,pipeline};
+  const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`research-roster.json`;a.click();
 }
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;

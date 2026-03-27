@@ -420,6 +420,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent-bd); back
       <input type="hidden" id="p-tags" value="">
     </div>
     <div class="fg"><div class="lbl">Notes</div><textarea id="p-notes" rows="2" placeholder="Optional notes"></textarea></div>
+    <div class="fg"><div class="lbl">Start date</div><input id="p-startdate" type="date" title="Used by Cowork to flag overdue projects"></div>
     <div class="m-actions">
       <button class="btn btn-g" onclick="closeProjModal()">Cancel</button>
       <button class="btn btn-p" onclick="saveProj()">Save project</button>
@@ -920,6 +921,7 @@ function openProjModal(id=null){
   document.getElementById('p-journal').value=p?.journal||'';
   document.getElementById('p-capacity').value=p?.capacity||4;
   document.getElementById('p-notes').value=p?.notes||'';
+  document.getElementById('p-startdate').value=p?.startDate||'';
   initTagInput('p-tags',p?.tags||[]);
   document.getElementById('mProj').style.display='flex';
   setTimeout(()=>document.getElementById('p-title').focus(),50);
@@ -927,7 +929,7 @@ function openProjModal(id=null){
 function closeProjModal(){document.getElementById('mProj').style.display='none';editProjId=null;}
 function saveProj(){
   const title=document.getElementById('p-title').value.trim();if(!title)return;
-  const d={title,type:document.getElementById('p-type').value,status:document.getElementById('p-status').value,journal:document.getElementById('p-journal').value.trim(),capacity:parseInt(document.getElementById('p-capacity').value)||4,notes:document.getElementById('p-notes').value.trim(),tags:getTagsFromInput('p-tags')};
+  const d={title,type:document.getElementById('p-type').value,status:document.getElementById('p-status').value,journal:document.getElementById('p-journal').value.trim(),capacity:parseInt(document.getElementById('p-capacity').value)||4,notes:document.getElementById('p-notes').value.trim(),startDate:document.getElementById('p-startdate').value||'',tags:getTagsFromInput('p-tags')};
   if(editProjId){projects=projects.map(p=>p.id===editProjId?{...p,...d}:p);}
   else{
     projects.push({id:'p'+Date.now(),...d,team:[],addedDate:new Date().toISOString().slice(0,10)});

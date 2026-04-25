@@ -86,7 +86,7 @@ body { background: var(--bg); color: var(--t1); font-family: var(--sans); font-s
 /* ── LAYOUT ── */
 .main-layout { display: grid; grid-template-columns: 1fr 306px; height: calc(100vh - 85px); overflow: hidden; max-width: 1600px; margin: 0 auto; }
 .proj-col { overflow-y: auto; padding: 26px 28px 60px; background: var(--bg); }
-.people-col { overflow-y: auto; border-left: 3px solid var(--border); background: var(--surface-2); padding: 20px 18px 60px; }
+.people-col { overflow-y: auto; border-left: 3px solid var(--border); background: var(--surface-2); padding: 26px 18px 60px; }
 
 /* ── BUTTONS ── */
 .btn { border-radius: var(--rs); padding: 8px 16px; font-family: var(--sans); font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.05em; transition: all 0.15s; border: 1px solid var(--border); text-transform: uppercase; box-shadow: 2px 2px 0px var(--border); }
@@ -94,6 +94,12 @@ body { background: var(--bg); color: var(--t1); font-family: var(--sans); font-s
 .btn-p:hover { background: var(--accent); transform: translate(1px, 1px); box-shadow: 1px 1px 0px var(--border); border-color: var(--border); }
 .btn-g { background: var(--surface); color: var(--t1); }
 .btn-g:hover { background: var(--surface-2); transform: translate(1px, 1px); box-shadow: 1px 1px 0px var(--border); }
+.btn:hover { transform: translate(1px, 1px); box-shadow: 1px 1px 0px var(--border); }
+.btn:active, .btn-p:active, .btn-g:active { transform: translate(2px, 2px); box-shadow: none; }
+.btn-danger { color: #b91c1c; border-color: rgba(185,28,28,0.3); background: rgba(185,28,28,0.05); }
+.btn-danger:hover { background: rgba(185,28,28,0.12); color: #991b1b; border-color: rgba(185,28,28,0.5); }
+.btn-muted { background: var(--surface); color: var(--t2); border-color: var(--border); }
+.btn-muted:hover { background: var(--surface-2); color: var(--t1); }
 .ibtn { background: var(--surface); border: 1px solid var(--border); color: var(--t1); border-radius: 0; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.1s; font-family: var(--sans); box-shadow: 1px 1px 0px var(--border);}
 .ibtn:hover { transform: translate(1px,1px); box-shadow: none; background: var(--surface-2); border-color: var(--border); color: var(--t1); }
 .ibtn-r { color: var(--red); }
@@ -101,7 +107,7 @@ body { background: var(--bg); color: var(--t1); font-family: var(--sans); font-s
 
 /* ── INPUTS ── */
 input, textarea, select {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); color: var(--t1); font-family: var(--sans); font-size: 13px; padding: 8px 11px; outline: none; transition: border-color 0.15s, background 0.15s; width: 100%; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); color: var(--t1); font-family: var(--sans); font-size: 13px; padding: 8px 11px; outline: none; transition: border-color 0.15s, background 0.15s; width: 100%;
 }
 input:focus, textarea:focus, select:focus { border-color: var(--accent); background: #fff; box-shadow: inset 2px 2px 0px rgba(176, 74, 42, 0.1); }
 .lbl { font-size: 10px; color: var(--t1); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; font-weight: 700; font-family: var(--sans); }
@@ -149,7 +155,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
 .proj-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; border-bottom: 3px solid var(--border); padding-bottom: 16px; }
 .proj-section-title { font-family: var(--serif); font-size: 34px; font-weight: 400; color: var(--t1); }
 .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; align-items: center; }
-.search-input { background: var(--surface); border: 1px solid var(--border); color: var(--t1); font-size: 12px; padding: 9px 14px; width: 240px; font-family: var(--sans); outline: none; transition: border-color 0.15s; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05); }
+.search-input { background: var(--surface); border: 1px solid var(--border); color: var(--t1); font-size: 12px; padding: 9px 14px; width: 240px; font-family: var(--sans); outline: none; transition: all 0.15s; box-shadow: 2px 2px 0px var(--border); border-radius: 0; }
 .search-input:focus { border-color: var(--accent); border-width: 2px; padding: 8px 13px; }
 .proj-list { display: flex; flex-direction: column; gap: 0; }
 
@@ -159,7 +165,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
 .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 3px solid var(--border); }
 .kanban-col-title { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--sans); color: var(--t1); }
 .kanban-col-count { font-family: var(--serif); font-size: 24px; font-weight: 400; font-style: italic; line-height: 1; }
-.kanban-card { background: var(--surface); border: 1px solid var(--border); padding: 16px; margin-bottom: 16px; box-shadow: var(--shm); transition: transform 0.1s, box-shadow 0.1s; position: relative; }
+.kanban-card { cursor: pointer; background: var(--surface); border: 1px solid var(--border); padding: 16px; margin-bottom: 16px; box-shadow: var(--shm); transition: transform 0.1s, box-shadow 0.1s; position: relative; }
 .kanban-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px rgba(42,37,31,0.25); border-color: var(--border-h); }
 .kc-type { font-size: 10px; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: inline-block; color: var(--t2); }
 .kc-title { font-family: var(--serif); font-size: 18px; font-weight: 400; line-height: 1.3; color: var(--t1); margin-bottom: 6px; }
@@ -217,21 +223,21 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
 
 /* ── PEOPLE SIDEBAR ── */
 .people-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 3px solid var(--border); padding-bottom: 8px; }
-.people-title { font-family: var(--serif); font-size: 24px; font-weight: 400; color: var(--t1); }
+.people-title { font-family: var(--serif); font-size: 34px; font-weight: 400; color: var(--t1); }
 .people-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
 .people-search { margin-bottom: 16px; }
-.people-search input { font-size: 12px; padding: 8px 12px; border-radius: 0; border: 1px solid var(--border); background: var(--surface); }
+.people-search input { font-size: 12px; padding: 8px 12px; border-radius: 0; border: 1px solid var(--border); background: var(--surface); box-shadow: 2px 2px 0px var(--border); }
 .person-card { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s; box-shadow: 3px 3px 0px rgba(42,37,31,0.1); position: relative; }
 .person-card:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px rgba(42,37,31,0.2); }
 .person-card::before { content: ''; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 6px; border-right: 1px solid var(--border); }
 .person-card.is-active::before  { background: var(--green); }
 .person-card.is-previous::before { background: var(--blue); }
 .person-card.is-pending::before { background: var(--gold); }
-.pc-name-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; padding-left: 8px; }
+.pc-name-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; margin-bottom: 8px; padding-left: 8px; flex-wrap: wrap; }
 .pc-avatar-name { display: flex; align-items: center; gap: 10px; }
 .pc-person-avatar { width: 36px; height: 36px; border-radius: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--bg); background: var(--t1); border: 1px solid var(--border); flex-shrink: 0; }
 .pc-person-name { font-size: 15px; font-weight: 700; color: var(--t1); font-family: var(--sans); }
-.person-status-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--border); font-family: var(--sans); }
+.person-status-badge { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--border); font-family: var(--sans);  flex-shrink: 0; align-self: flex-start; }
 .badge-active   { background: var(--green-bg); color: var(--t1); }
 .badge-previous { background: var(--blue-bg); color: var(--t1); }
 .badge-pending  { background: var(--surface-3); color: var(--t1); }
@@ -282,6 +288,15 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
 
 /* ── PIPELINE ── */
 .pipeline-section { margin-top: 16px; border-top: 3px solid var(--border); padding-top: 16px; }
+.proj-detail-title { font-family: var(--serif); font-size: 22px; font-weight: 400; color: var(--t1); line-height: 1.35; margin-bottom: 6px; }
+.proj-detail-section { margin-bottom: 18px; }
+.proj-detail-label { font-size: 9px; color: var(--t4); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 9px; font-weight: 700; font-family: var(--sans); }
+.proj-detail-member { display: flex; align-items: center; gap: 9px; background: var(--surface-2); border: 1px solid var(--border); padding: 8px 12px; cursor: pointer; transition: all 0.12s; box-shadow: 2px 2px 0px var(--border); }
+.proj-detail-member:hover { transform: translate(1px,1px); box-shadow: 1px 1px 0px var(--border); background: var(--surface); }
+.proj-detail-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+.proj-detail-meta-item { background: var(--surface-2); border: 1px solid var(--border); padding: 10px 13px; }
+.proj-detail-meta-label { font-size: 9px; color: var(--t4); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
+.proj-detail-meta-value { font-size: 14px; color: var(--t1); font-family: var(--serif); font-weight: 400; }
 .pipeline-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 0; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--t1); user-select: none; font-family: var(--serif); }
 .pipeline-toggle:hover { color: var(--accent); }
 .pipeline-toggle svg { transition: transform 0.2s; flex-shrink: 0; }
@@ -322,7 +337,6 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-active">0</div><div class="hdr-stat-l">Active</div></div>
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-total">0</div><div class="hdr-stat-l">Total</div></div>
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-collabs">0</div><div class="hdr-stat-l">People</div></div>
-    <div class="hdr-stat"><div class="hdr-stat-n" id="stat-pending">0</div><div class="hdr-stat-l">Pending</div></div>
     <div class="hdr-stat"><div class="hdr-stat-n" id="stat-slots">0</div><div class="hdr-stat-l">Open Slots</div></div>
   </div>
   <div class="hdr-actions">
@@ -481,8 +495,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
     <div id="profileContent"></div>
     <div class="m-actions">
       <button class="btn btn-g" onclick="closeProfile()">Close</button>
-      <button class="ibtn ibtn-r" onclick="deletePersonFromProfile()" style="padding:8px 14px;">Delete</button>
-      <button class="ibtn" id="pendingToggleBtn" onclick="togglePendingStatus()" style="padding:8px 14px;"></button>
+      <button class="btn btn-danger" onclick="deletePersonFromProfile()">Delete</button>
+      <button class="btn btn-muted" id="pendingToggleBtn" onclick="togglePendingStatus()"></button>
       <button class="btn btn-p" onclick="editPersonFromProfile()">Edit</button>
     </div>
   </div>
@@ -512,6 +526,30 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
     <div class="m-actions">
       <button class="btn btn-g" onclick="closePipelineModal()">Cancel</button>
       <button class="btn btn-p" onclick="savePipeline()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT DETAIL MODAL -->
+<div class="overlay" id="mProjDetail" style="display:none" onclick="if(event.target===this)closeProjDetail()">
+  <div class="modal modal-wide">
+    <div id="projDetailContent"></div>
+    <div class="m-actions">
+      <button class="btn btn-g" onclick="closeProjDetail()">Close</button>
+      <button class="btn btn-muted" id="projDetailEditBtn">Edit</button>
+      <button class="btn btn-p" id="projDetailAssignBtn">+ Collaborator</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM CONFIRM MODAL -->
+<div class="overlay" id="mConfirm" style="display:none" onclick="if(event.target===this)_confirmCancel()">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-sup">Confirm</div>
+    <div id="mConfirmMsg" style="font-size:14px;color:var(--t2);margin-bottom:4px;line-height:1.6;"></div>
+    <div class="m-actions">
+      <button class="btn btn-g" onclick="_confirmCancel()">Cancel</button>
+      <button class="btn btn-p" onclick="_confirmOk()">Confirm</button>
     </div>
   </div>
 </div>
@@ -597,7 +635,6 @@ function renderStats(){
   document.getElementById('stat-active').textContent  = activeProjects().length;
   document.getElementById('stat-total').textContent   = projects.length;
   document.getElementById('stat-collabs').textContent = people.length;
-  document.getElementById('stat-pending').textContent = people.filter(p=>personStatus(p.id)==='pending').length;
   document.getElementById('stat-slots').textContent   = activeProjects().reduce((a,p)=>a+Math.max(0,p.capacity-p.team.length),0);
 }
 
@@ -625,7 +662,7 @@ function renderPriorityView(ap, q){
       const used=proj.team.length, cap=proj.capacity, open=cap-used;
       const isFull=used>=cap;
       const team=proj.team.map(id=>people.find(p=>p.id===id)).filter(Boolean);
-      const avatars=team.slice(0,4).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}">${esc(initials(per.name))}</div>`).join('');
+      const avatars=team.slice(0,4).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}" onclick="event.stopPropagation();openProfile('${per.id}')">${esc(initials(per.name))}</div>`).join('');
       const upDis  = globalIdx===0              ?'opacity:0.18;cursor:default;':'';
       const downDis= globalIdx===ap.length-1    ?'opacity:0.18;cursor:default;':'';
       const slotPill=isFull
@@ -696,16 +733,16 @@ function buildKanbanCard(proj,idx,total){
   const isFull=used>=cap;
   const capCls=isFull?'kc-cap-full':used/cap>=0.75?'kc-cap-mid':'kc-cap-ok';
   const team=proj.team.map(id=>people.find(p=>p.id===id)).filter(Boolean);
-  const avatars=team.slice(0,5).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}">${esc(initials(per.name))}</div>`).join('');
+  const avatars=team.slice(0,5).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}" onclick="event.stopPropagation();openProfile('${per.id}')">${esc(initials(per.name))}</div>`).join('');
   const extraNames=team.length>5?team.slice(5).map(p=>esc(p.name)).join(', '):'';
   const moreCount=team.length>5?`<div style="font-size:10px;font-weight:700;color:var(--accent);margin-left:2px;cursor:default;background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:4px;padding:1px 6px;" title="${extraNames}">+${team.length-5}</div>`:'';
   const slotPill=isFull
     ? `<span style="font-size:10px;color:var(--t4);background:var(--surface-3);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-weight:600;letter-spacing:0.04em;">Full</span>`
-    : `<span style="font-size:10px;font-weight:700;color:#15803d;background:rgba(21,128,61,0.1);border:1px solid rgba(21,128,61,0.28);border-radius:4px;padding:2px 9px;cursor:pointer;letter-spacing:0.04em;" onclick="openAssign('${proj.id}')" title="Add collaborator">+ ${open} open</span>`;
+    : `<span style="font-size:10px;font-weight:700;color:#15803d;background:rgba(21,128,61,0.1);border:1px solid rgba(21,128,61,0.28);border-radius:4px;padding:2px 9px;cursor:pointer;letter-spacing:0.04em;" onclick="event.stopPropagation();openAssign('${proj.id}')" title="Add collaborator">+ ${open} open</span>`;
   const cardStyle=isFull?'':'border-left:3px solid rgba(21,128,61,0.5);';
   const globalRank=activeProjects().indexOf(proj)+1;
   const rankColor=globalRank<=3?'#15803d':globalRank<=6?'#b45309':'var(--t4)';
-  return `<div class="kanban-card" id="pc-${proj.id}" style="${cardStyle}">
+  return `<div class="kanban-card" id="pc-${proj.id}" style="${cardStyle}" onclick="openProjDetail('${proj.id}')">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
       <div class="kc-type" style="color:${tm.color};background:${tm.bg};border:1px solid ${tm.bd};border-radius:4px;padding:2px 8px;display:inline-flex;align-items:center;gap:4px;font-weight:700;">${tm.icon} ${esc(tm.label)}</div>
       <span style="font-family:var(--serif);font-size:18px;font-weight:700;color:${rankColor};line-height:1;" title="Global priority #${globalRank}">#${globalRank}</span>
@@ -718,7 +755,7 @@ function buildKanbanCard(proj,idx,total){
       <div class="kc-team">${avatars}${moreCount}</div>
       <div style="display:flex;align-items:center;gap:6px;">
         ${slotPill}
-        <div class="kc-actions">
+        <div class="kc-actions" onclick="event.stopPropagation()">
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Return to pipeline" onclick="returnToPipeline('${proj.id}')">↩</button>
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${proj.id}')">✎</button>
           <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${proj.id}')">×</button>
@@ -731,6 +768,9 @@ function renderProjects(){
   renderProjPills();
   const q=document.getElementById('projSearch').value.toLowerCase();
   const ap=activeProjects();
+  // Show/hide filter pills depending on view
+  const _pills=document.getElementById('projPills');
+  if(_pills) _pills.style.display=(currentView==='kanban')?'flex':'none';
 
   if(currentView==='priority'){ document.getElementById('pipelineViewContainer').style.display='none'; renderPriorityView(ap,q); renderArchivedSection(); return; }
   if(currentView==='pipeline'){ renderPipelineView(); return; }
@@ -786,11 +826,11 @@ function renderArchivedSection(){
       const cards=byYear[yr].map(p=>{
         const tm=TYPE_META[p.type]||{icon:'◇',label:p.type};
         const team=p.team.map(id=>people.find(per=>per.id===id)).filter(Boolean);
-        const avatars=team.slice(0,5).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}">${esc(initials(per.name))}</div>`).join('');
+        const avatars=team.slice(0,5).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}" onclick="event.stopPropagation();openProfile('${per.id}')">${esc(initials(per.name))}</div>`).join('');
         const extraNames=team.length>5?team.slice(5).map(p=>esc(p.name)).join(', '):'';
   const moreCount=team.length>5?`<div style="font-size:10px;font-weight:700;color:var(--accent);margin-left:2px;cursor:default;background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:4px;padding:1px 6px;" title="${extraNames}">+${team.length-5}</div>`:'';
         const hasJournal=p.journal&&p.journal!=='TBD'&&p.journal!=='PROSPERO';
-        return `<div class="kanban-card archived-card" style="flex:0 0 268px;min-width:268px;">
+        return `<div class="kanban-card archived-card" style="flex:0 0 268px;min-width:268px;cursor:pointer;" onclick="openProjDetail('${p.id}')">
           <div class="kc-type" style="color:${tm.color};background:${tm.bg};border:1px solid ${tm.bd};border-radius:4px;padding:2px 8px;display:inline-flex;align-items:center;gap:4px;font-weight:700;margin-bottom:7px;">${tm.icon} ${esc(tm.label)}</div>
           <div class="kc-title" style="font-size:13px;">${esc(p.title)}</div>
           ${hasJournal?`<div class="kc-journal">${esc(p.journal)}</div>`:''}
@@ -901,7 +941,7 @@ let editProjId=null;
 function openProjModal(id=null){
   editProjId=id;
   const isN=!id;
-  document.getElementById('mProjSup').textContent=isN?'New Project':'Edit Project';
+  document.getElementById('mProjSup').textContent=isN?'New Project':'Edit View';
   document.getElementById('mProjTitle').textContent=isN?'Add a new project':'Edit project details';
   const p=id?projects.find(x=>x.id===id):null;
   document.getElementById('p-title').value=p?.title||'';
@@ -919,6 +959,14 @@ function closeProjModal(){document.getElementById('mProj').style.display='none';
 function saveProj(){
   const title=document.getElementById('p-title').value.trim();if(!title)return;
   const d={title,type:document.getElementById('p-type').value,status:document.getElementById('p-status').value,journal:document.getElementById('p-journal').value.trim(),capacity:parseInt(document.getElementById('p-capacity').value)||4,notes:document.getElementById('p-notes').value.trim(),startDate:document.getElementById('p-startdate').value||'',tags:getTagsFromInput('p-tags')};
+  // Auto-set publish year when status is published
+  if(d.status==='published'){
+    const existingProj=editProjId?projects.find(p=>p.id===editProjId):null;
+    const wasAlreadyPublished=existingProj?.status==='published';
+    if(!wasAlreadyPublished){
+      d.addedDate=String(new Date().getFullYear());
+    }
+  }
   if(editProjId){projects=projects.map(p=>p.id===editProjId?{...p,...d}:p);}
   else{
     projects.push({id:'p'+Date.now(),...d,team:[],addedDate:new Date().toISOString().slice(0,10)});
@@ -927,13 +975,13 @@ function saveProj(){
   }
   saveProjects();closeProjModal();renderAll();
 }
-function deleteProj(id){if(!confirm('Delete this project?'))return;projects=projects.filter(p=>p.id!==id);saveProjects();renderAll();}
+async function deleteProj(id){if(!await customConfirm('Delete this project? This cannot be undone.'))return;projects=projects.filter(p=>p.id!==id);saveProjects();renderAll();}
 
 let editPersonId=null,profilePersonId=null;
 function openPersonModal(id=null){
   editPersonId=id;
   const isN=!id;
-  document.getElementById('mPersonSup').textContent=isN?'New Collaborator':'Edit Collaborator';
+  document.getElementById('mPersonSup').textContent=isN?'New Collaborator':'Edit View';
   document.getElementById('mPersonTitle').textContent=isN?'Add a collaborator':'Edit collaborator';
   const p=id?people.find(x=>x.id===id):null;
   document.getElementById('per-name').value=p?.name||'';
@@ -958,8 +1006,8 @@ function savePerson(){
   else{people.push({id:'per'+Date.now(),...d,addedDate:new Date().toISOString().slice(0,10)});}
   savePeople();closePersonModal();renderAll();
 }
-function deletePerson(id){
-  if(!confirm('Delete this collaborator?'))return;
+async function deletePerson(id){
+  if(!await customConfirm('Delete this collaborator? They will be removed from all projects.'))return;
   people=people.filter(p=>p.id!==id);
   projects=projects.map(p=>({...p,team:p.team.filter(t=>t!==id)}));
   savePeople();saveProjects();renderAll();
@@ -1007,7 +1055,7 @@ function openProfile(id){
   document.getElementById('profileContent').innerHTML=html;
   document.getElementById('mProfile').style.display='flex';
   const _pb=document.getElementById('pendingToggleBtn');
-  if(_pb){ const _pp=people.find(x=>x.id===id); _pb.textContent=_pp?.isPending?'🔓 Unmark pending':'🔒 Mark as pending'; _pb.innerHTML=_pp?.isPending?'🔓 Remove pending override':'🔒 Force pending'; }
+  if(_pb){ const _pp=people.find(x=>x.id===id); _pb.textContent=_pp?.isPending?'Unmark pending':'Mark as pending'; _pb.innerHTML=_pp?.isPending?'Remove pending override':'Force pending'; }
 }
 function togglePendingStatus(){
   const p=people.find(x=>x.id===profilePersonId);if(!p)return;
@@ -1061,8 +1109,8 @@ function assignMember(projId,personId){
   proj.team.push(personId);
   saveProjects();closeAssign();renderAll();
 }
-function removeMemberFromProfile(projId,personId){
-  if(!confirm('Remove from this project?'))return;
+async function removeMemberFromProfile(projId,personId){
+  if(!await customConfirm('Remove this person from the project?'))return;
   const proj=projects.find(p=>p.id===projId);if(!proj)return;
   proj.team=proj.team.filter(id=>id!==personId);
   saveProjects();renderAll();openProfile(personId);
@@ -1095,7 +1143,7 @@ function exportAll(){
 }
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
-  ['mProj','mPerson','mProfile','mAssign','mPipeline'].forEach(id=>document.getElementById(id).style.display='none');
+  ['mProj','mPerson','mProfile','mAssign','mPipeline','mConfirm','mProjDetail'].forEach(id=>document.getElementById(id).style.display='none');
   editProjId=null;editPersonId=null;profilePersonId=null;
 });
 // ═══ PIPELINE ═══
@@ -1184,8 +1232,8 @@ function savePipeline(){
   else{pipeline.push({id:'pl'+Date.now(),...d,addedDate:new Date().toISOString().slice(0,10)});}
   savePipeline_();closePipelineModal();renderPipeline();
 }
-function deletePipeline(id){
-  if(!confirm('Remove from pipeline?'))return;
+async function deletePipeline(id){
+  if(!await customConfirm('Remove this pipeline entry?'))return;
   pipeline=pipeline.filter(p=>p.id!==id);
   savePipeline_();renderPipeline();
 }
@@ -1201,9 +1249,86 @@ function promotePipeline(id){
 }
 
 
-function returnToPipeline(projId){
+// ── PROJECT DETAIL MODAL ────────────────────────────────────────────────────
+function openProjDetail(projId){
+  const proj=projects.find(p=>p.id===projId); if(!proj) return;
+  const sm=STATUS_META[proj.status]||{label:proj.status,cls:''};
+  const tm=TYPE_META[proj.type]||{icon:'◇',label:proj.type,color:'var(--t3)',bg:'transparent',bd:'var(--border)'};
+  const teamPeople=proj.team.map(id=>people.find(p=>p.id===id)).filter(Boolean);
+  const used=proj.team.length, cap=proj.capacity, open=cap-used;
+  const isFull=used>=cap;
+
+  const teamHTML = teamPeople.length ? teamPeople.map(per=>{
+    const c=personColor(per.id);
+    const sc=compatScore(per);
+    const cc=compatColor(sc);
+    const dots=per.isDoctor?'':Array.from({length:5},(_,i)=>`<div class="compat-dot" style="background:${i<Math.round(sc)?cc:'rgba(20,20,19,0.1)'}"></div>`).join('');
+    return `<div class="proj-detail-member" onclick="closeProjDetail();openProfile('${per.id}')">
+      <div style="width:32px;height:32px;background:${c};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;">${esc(initials(per.name))}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--t1);">${esc(per.name)}${per.isDoctor?` <span class="doctor-badge">MD</span>`:''}</div>
+        <div style="font-size:11px;color:var(--t3);">${esc(per.institution||'')}</div>
+      </div>
+      ${per.isDoctor?'':`<div style="display:flex;gap:2px;">${dots}</div>`}
+    </div>`;
+  }).join('') : `<div style="font-size:13px;color:var(--t4);font-style:italic;padding:8px 0;">No collaborators assigned yet.</div>`;
+
+  const tags = proj.tags?.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${proj.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>` : '';
+
+  // Meta items
+  const metaItems = [
+    {label:'Status',    value:`<span class="status-badge ${sm.cls}">${sm.label}</span>`},
+    {label:'Type',      value:`<span style="font-size:13px;font-weight:700;color:${tm.color};background:${tm.bg};border:1px solid ${tm.bd};padding:3px 9px;">${tm.icon} ${esc(tm.label)}</span>`},
+    {label:'Journal / Venue', value: proj.journal&&proj.journal!=='TBD' ? `<span style="font-style:italic;">${esc(proj.journal)}</span>` : `<span style="color:var(--t4);">—</span>`},
+        {label:'Capacity',  value:`${used}/${cap} — <span style="color:${isFull?'#b91c1c':'var(--green)'}">${isFull?'Full':open+' open slot'+(open!==1?'s':'')}</span>`},
+    {label:'Start date',value: proj.startDate ? proj.startDate : `<span style="color:var(--t4);">Not set</span>`},
+    {label:'Added',     value: proj.addedDate||'—'},
+  ];
+
+  const metaHTML = `<div class="proj-detail-meta-grid">${metaItems.map(m=>`
+    <div class="proj-detail-meta-item">
+      <div class="proj-detail-meta-label">${m.label}</div>
+      <div class="proj-detail-meta-value">${m.value}</div>
+    </div>`).join('')}</div>`;
+
+  document.getElementById('projDetailContent').innerHTML = `
+    <div style="margin-bottom:18px;">
+      <div class="proj-detail-title">${esc(proj.title)}</div>
+      ${tags}
+    </div>
+    <div class="proj-detail-meta-grid" style="margin-bottom:18px;">${metaItems.map(m=>`
+      <div class="proj-detail-meta-item">
+        <div class="proj-detail-meta-label">${m.label}</div>
+        <div class="proj-detail-meta-value">${m.value}</div>
+      </div>`).join('')}</div>
+    <div class="proj-detail-section">
+      <div class="proj-detail-label">Team (${teamPeople.length}/${cap})</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">${teamHTML}</div>
+    </div>
+    ${proj.notes?`<div class="proj-detail-section"><div class="proj-detail-label">Notes</div><div style="font-size:13px;color:var(--t2);line-height:1.6;padding:10px 13px;background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--border);">${esc(proj.notes)}</div></div>`:''}
+  `;
+
+  document.getElementById('projDetailEditBtn').onclick=()=>{ closeProjDetail(); openProjModal(projId); };
+  document.getElementById('projDetailAssignBtn').style.display=isFull?'none':'';
+  document.getElementById('projDetailAssignBtn').onclick=()=>{ closeProjDetail(); openAssign(projId); };
+  document.getElementById('mProjDetail').style.display='flex';
+}
+function closeProjDetail(){ document.getElementById('mProjDetail').style.display='none'; }
+
+// ── CUSTOM CONFIRM ──────────────────────────────────────────────────────────
+let _confirmOk=null, _confirmCancel=null;
+function customConfirm(msg){
+  return new Promise(resolve=>{
+    document.getElementById('mConfirmMsg').textContent=msg;
+    document.getElementById('mConfirm').style.display='flex';
+    _confirmOk=()=>{ document.getElementById('mConfirm').style.display='none'; resolve(true); };
+    _confirmCancel=()=>{ document.getElementById('mConfirm').style.display='none'; resolve(false); };
+  });
+}
+
+async function returnToPipeline(projId){
   const proj=projects.find(p=>p.id===projId);if(!proj)return;
-  if(!confirm('Return this project to the pipeline?'))return;
+  if(!await customConfirm('Return this project to the pipeline?'))return;
   pipeline.push({id:'pl'+Date.now(),title:proj.title,area:(proj.tags||[])[0]||'',priority:'medium',contactId:'',contact:'',followUp:'',notes:proj.notes||'',addedDate:new Date().toISOString().slice(0,10)});
   projects=projects.filter(p=>p.id!==projId);
   savePipeline_();saveProjects();
@@ -1238,6 +1363,13 @@ function sundayAutoExport(){
 
 renderAll();
 sundayAutoExport();
+// Set today's date in header
+(function(){
+  const el=document.getElementById('dateDisplay');
+  if(!el)return;
+  const d=new Date();
+  el.textContent=d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+})();
 </script>
 </body>
 </html>

@@ -330,6 +330,12 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
 .na-popover-btn.pop-waiting { background:#2c5282; color:#fff;    border-color:#2c5282; }
 .na-popover-btn.pop-blocked { background:#b91c1c; color:#fff;    border-color:#b91c1c; }
 .na-popover input { font-size:11px; padding:5px 8px; margin-top:0; }
+.move-popover { position:absolute; bottom:calc(100% + 6px); right:0; z-index:300; background:var(--bg); border:2px solid var(--border); box-shadow:4px 4px 0px var(--border); min-width:160px; animation:fi 0.12s ease; overflow:hidden; }
+.move-popover-item { display:block; width:100%; padding:9px 14px; text-align:left; background:transparent; border:none; border-bottom:1px solid var(--border); font-family:var(--sans); font-size:11px; font-weight:600; color:var(--t1); cursor:pointer; letter-spacing:0.03em; text-transform:uppercase; }
+.move-popover-item:last-child { border-bottom:none; }
+.move-popover-item:hover { background:var(--surface-2); }
+.move-popover-item.danger { color:var(--red); }
+.move-popover-item.danger:hover { background:rgba(185,28,28,0.07); }
 
 /* ── NA PICK BUTTONS ── */
 .na-pick { flex:1; padding:7px 6px; border:2px solid var(--border); background:var(--surface-2); font-family:var(--sans); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; cursor:pointer; transition:all 0.1s; color:var(--t2); }
@@ -667,7 +673,7 @@ function archivedProjects(){ return projects.filter(p=>p.status==='published'); 
 
 function renderStats(){
   document.getElementById('stat-active').textContent  = activeProjects().length;
-  document.getElementById('stat-total').textContent   = projects.length;
+  document.getElementById('stat-total').textContent   = projects.filter(p=>p.status!=='paused').length;
   document.getElementById('stat-collabs').textContent = people.length;
   document.getElementById('stat-slots').textContent   = activeProjects().reduce((a,p)=>a+Math.max(0,p.capacity-p.team.length),0);
 }
@@ -793,11 +799,9 @@ function buildKanbanCard(proj,idx,total){
       <div style="display:flex;align-items:center;gap:6px;">
         ${slotPill}
         <div class="kc-actions" onclick="event.stopPropagation()" style="position:relative;">
-          <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Return to pipeline" onclick="returnToPipeline('${proj.id}')">↩</button>
-          <button class="ibtn" style="font-size:9px;padding:2px 5px;" title="Send to archive" onclick="sendToArchive('${proj.id}')">⏸</button>
-          <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Next action" onclick="toggleNAPopover(event,'${proj.id}')">⚡</button>
+          <button class="ibtn" style="font-size:9px;padding:2px 7px;" title="Next action" onclick="toggleNAPopover(event,'${proj.id}')">◎</button>
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${proj.id}')">✎</button>
-          <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${proj.id}')">×</button>
+          <button class="ibtn" style="font-size:9px;padding:2px 7px;font-weight:700;letter-spacing:0.05em;" title="Move / Delete" onclick="toggleMovePopover(event,'${proj.id}')">···</button>
         </div>
       </div>
     </div>
@@ -1188,9 +1192,9 @@ function exportAll(){
   const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`research-roster.json`;a.click();
 }
-document.addEventListener('click', ()=>closeNAPopover());
+document.addEventListener('click', ()=>{ closeNAPopover(); closeMovePopover(); });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') closeNAPopover();
+  if(e.key==='Escape'){ closeNAPopover(); closeMovePopover(); }
   if(e.key!=='Escape')return;
   ['mProj','mPerson','mProfile','mAssign','mPipeline','mConfirm','mProjDetail'].forEach(id=>document.getElementById(id).style.display='none');
   editProjId=null;editPersonId=null;profilePersonId=null;
@@ -1416,6 +1420,32 @@ function toggleNAPopover(e, projId){
   if(actionsDiv){ actionsDiv.insertAdjacentHTML('beforeend', html); }
 }
 
+// ── MOVE POPOVER ──────────────────────────────────────────────────────────────
+let _movePopoverProjId = null;
+
+function toggleMovePopover(e, projId){
+  e.stopPropagation();
+  if(_movePopoverProjId === projId){ closeMovePopover(); return; }
+  closeMovePopover();
+  _movePopoverProjId = projId;
+  const popId = 'mv-pop-' + projId;
+  const markup = `<div class="move-popover" id="${popId}" onclick="event.stopPropagation()">
+    <button class="move-popover-item" onclick="returnToPipeline('${projId}');closeMovePopover()">↩ Return to pipeline</button>
+    <button class="move-popover-item" onclick="sendToArchive('${projId}');closeMovePopover()">⏸ Send to archive</button>
+    <button class="move-popover-item danger" onclick="deleteProj('${projId}');closeMovePopover()">× Delete project</button>
+  </div>`;
+  const actionsDiv = e.currentTarget.closest('.kc-actions');
+  if(actionsDiv) actionsDiv.insertAdjacentHTML('beforeend', markup);
+}
+
+function closeMovePopover(){
+  if(_movePopoverProjId){
+    const el=document.getElementById('mv-pop-'+_movePopoverProjId);
+    if(el) el.remove();
+    _movePopoverProjId=null;
+  }
+}
+
 function closeNAPopover(){
   if(_naPopoverProjId){
     const el = document.getElementById('na-pop-' + _naPopoverProjId);
@@ -1480,9 +1510,10 @@ function pickNAOwner(val){
 }
 
 // ── ARCHIVE ────────────────────────────────────────────────────────────────
-function sendToArchive(projId){
+async function sendToArchive(projId){
   const proj=projects.find(p=>p.id===projId); if(!proj) return;
-  proj.status='paused'; saveProjects(); renderAll(); setView('archive');
+  if(!await customConfirm('Send this project to the archive? It won\'t count toward active or total projects.'))return;
+  proj.status='paused'; saveProjects(); renderAll();
 }
 function reactivateProject(projId){
   openProjModal(projId);

@@ -381,6 +381,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
           <button class="view-btn" id="btnPriority" onclick="setView('priority')">&#9776; Priority</button>
           <button class="view-btn" id="btnPipeline" onclick="setView('pipeline')">→ Pipeline</button>
           <button class="view-btn" id="btnArchive" onclick="setView('archive')">⏸ Archive</button>
+          <button class="view-btn" id="btnPublished" onclick="setView('published')">★ Published</button>
         </div>
         <input class="search-input" id="projSearch" placeholder="Search title, journal&#8230;" oninput="renderProjects()">
       </div>
@@ -397,6 +398,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
     </div>
 
     <div id="archiveViewContainer" style="display:none;"><div id="archiveList"></div></div>
+    <div id="publishedViewContainer" style="display:none;"><div id="publishedList"></div></div>
     <div id="pipelineViewContainer" style="display:none;">
       <div class="priority-list" id="pipelineList"></div>
     </div>
@@ -676,6 +678,10 @@ function renderStats(){
   document.getElementById('stat-total').textContent   = projects.filter(p=>p.status!=='paused').length;
   document.getElementById('stat-collabs').textContent = people.length;
   document.getElementById('stat-slots').textContent   = activeProjects().reduce((a,p)=>a+Math.max(0,p.capacity-p.team.length),0);
+  const _pbb=document.getElementById('btnPublished');
+  if(_pbb){ const _pc2=archivedProjects().length; _pbb.textContent=_pc2?`★ Published (${_pc2})`:'★ Published'; }
+  const _abb=document.getElementById('btnArchive');
+  if(_abb){ const _pc3=pausedProjects().length; _abb.textContent=_pc3?`⏸ Archive (${_pc3})`:'⏸ Archive'; }
 }
 
 function setView(v){
@@ -684,6 +690,7 @@ function setView(v){
   document.getElementById('btnPriority').classList.toggle('active', v==='priority');
   document.getElementById('btnPipeline').classList.toggle('active', v==='pipeline');
   document.getElementById('btnArchive').classList.toggle('active', v==='archive');
+  document.getElementById('btnPublished').classList.toggle('active', v==='published');
   renderProjects();
 }
 
@@ -815,13 +822,15 @@ function renderProjects(){
   const _pills=document.getElementById('projPills');
   if(_pills) _pills.style.display=(currentView==='kanban')?'flex':'none';
 
-  if(currentView==='priority'){ document.getElementById('archiveViewContainer').style.display='none'; document.getElementById('pipelineViewContainer').style.display='none'; renderPriorityView(ap,q); renderArchivedSection(); return; }
+  if(currentView==='priority'){ document.getElementById('archiveViewContainer').style.display='none'; document.getElementById('publishedViewContainer').style.display='none'; document.getElementById('pipelineViewContainer').style.display='none'; renderPriorityView(ap,q); return; }
   if(currentView==='pipeline'){ renderPipelineView(); return; }
-  if(currentView==='archive'){ document.getElementById('archiveViewContainer').style.display='block'; renderArchiveView(); return; }
+  if(currentView==='archive'){ document.getElementById('archiveViewContainer').style.display='block'; document.getElementById('publishedViewContainer').style.display='none'; renderArchiveView(); return; }
+  if(currentView==='published'){ document.getElementById('publishedViewContainer').style.display='block'; document.getElementById('archiveViewContainer').style.display='none'; renderPublishedView(); return; }
 
   document.getElementById('archiveViewContainer').style.display='none';
+  document.getElementById('publishedViewContainer').style.display='none';
   document.getElementById('pipelineViewContainer').style.display='none';
-  document.getElementById('archivedSection').style.display='';
+  document.getElementById('archivedSection').style.display='none';
   const board=document.getElementById('projList');
   board.innerHTML='';
 
@@ -846,8 +855,6 @@ function renderProjects(){
   });
 
   board.appendChild(kanban);
-
-  renderArchivedSection();
 }
 
 function renderArchivedSection(){
@@ -1209,6 +1216,7 @@ function renderPipelineView(){
   document.getElementById('projList').innerHTML='';
   document.getElementById('archivedSection').style.display='none';
   document.getElementById('archiveViewContainer').style.display='none';
+  document.getElementById('publishedViewContainer').style.display='none';
   document.getElementById('pipelineViewContainer').style.display='block';
   renderPipeline();
 }
@@ -1218,6 +1226,8 @@ function renderPipeline(){
   if(btn) btn.textContent=`→ Pipeline${pipeline.length?' ('+pipeline.length+')':''}`;
   const _ab=document.getElementById('btnArchive');
   if(_ab){ const _pc=pausedProjects().length; _ab.textContent=_pc?`⏸ Archive (${_pc})`:'⏸ Archive'; }
+  const _pb=document.getElementById('btnPublished');
+  if(_pb){ const _pubc=archivedProjects().length; _pb.textContent=_pubc?`★ Published (${_pubc})`:'★ Published'; }
   if(!pipeline.length){
     document.getElementById('pipelineList').innerHTML=`<div class="empty-state"><strong>No pipeline entries</strong>Add potential projects you want to follow up on.</div>`;
     return;
@@ -1507,6 +1517,50 @@ function pickNAOwner(val){
       b.style.background='var(--surface-2)'; b.style.color='var(--t2)'; b.style.borderColor='var(--border)';
     }
   });
+}
+
+// ── PUBLISHED VIEW ────────────────────────────────────────────────────────────
+function renderPublishedView(){
+  document.getElementById('projList').innerHTML='';
+  document.getElementById('archivedSection').style.display='none';
+  document.getElementById('archiveViewContainer').style.display='none';
+  document.getElementById('pipelineViewContainer').style.display='none';
+  document.getElementById('publishedViewContainer').style.display='block';
+  const q=document.getElementById('projSearch').value.toLowerCase();
+  const pub=archivedProjects().filter(p=>!q||p.title.toLowerCase().includes(q)||(p.journal||'').toLowerCase().includes(q));
+  if(!pub.length){
+    document.getElementById('publishedList').innerHTML=`<div class="empty-state"><strong>No published works yet</strong></div>`;
+    return;
+  }
+  // Group by year
+  const byYear={};
+  pub.forEach(p=>{ const yr=(p.addedDate||'').slice(0,4)||'—'; if(!byYear[yr])byYear[yr]=[]; byYear[yr].push(p); });
+  const years=Object.keys(byYear).sort((a,b)=>b-a);
+  document.getElementById('publishedList').innerHTML=years.map(yr=>{
+    const cards=byYear[yr].map(p=>{
+      const tm=TYPE_META[p.type]||{icon:'◇',label:p.type,color:'var(--t3)',bg:'transparent',bd:'var(--border)'};
+      const team=p.team.map(id=>people.find(per=>per.id===id)).filter(Boolean);
+      const avatars=team.slice(0,5).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}" onclick="event.stopPropagation();openProfile('${per.id}')">${esc(initials(per.name))}</div>`).join('');
+      const extra=team.length>5?`<div style="font-size:10px;font-weight:700;color:var(--accent);margin-left:2px;background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:4px;padding:1px 6px;">+${team.length-5}</div>`:'';
+      const hasJournal=p.journal&&p.journal!=='TBD'&&p.journal!=='PROSPERO';
+      return `<div class="kanban-card archived-card" style="flex:0 0 268px;min-width:268px;cursor:pointer;" onclick="openProjDetail('${p.id}')">
+        <div class="kc-type" style="color:${tm.color};background:${tm.bg};border:1px solid ${tm.bd};border-radius:4px;padding:2px 8px;display:inline-flex;align-items:center;gap:4px;font-weight:700;margin-bottom:7px;">${tm.icon} ${esc(tm.label)}</div>
+        <div class="kc-title" style="font-size:13px;">${esc(p.title)}</div>
+        ${hasJournal?`<div class="kc-journal">${esc(p.journal)}</div>`:''}
+        <div class="kc-footer">
+          <div style="display:flex;align-items:center;gap:4px;"><div class="kc-team">${avatars}</div>${extra}</div>
+          <div class="kc-actions" onclick="event.stopPropagation()">
+            <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${p.id}')">✎</button>
+            <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${p.id}')">×</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:22px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.14em;color:var(--t4);margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);">${yr}</div>
+      <div class="kanban-board" style="margin:0;">${cards}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── ARCHIVE ────────────────────────────────────────────────────────────────

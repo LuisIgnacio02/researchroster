@@ -141,6 +141,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
 .s-writing         { background: var(--blue-bg);       color: var(--t1); }
 .s-data_extraction { background: var(--accent-bg);     color: var(--t1); }
 .s-published       { background: var(--surface-3);     color: var(--t1); }
+.s-paused          { background: rgba(44,82,130,0.12); color: var(--t1); }
 .s-conception      { background: var(--surface-2);     color: var(--t1); }
 .s-screening       { background: var(--gold);          color: var(--bg); }
 
@@ -320,6 +321,23 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
 /* ── PIPELINE VIEW CONTAINER ── */
 #pipelineViewContainer { display: none; }
 
+/* ── NA POPOVER ── */
+.na-popover { position:absolute; bottom:calc(100% + 6px); right:0; z-index:300; background:var(--bg); border:2px solid var(--border); box-shadow:4px 4px 0px var(--border); padding:10px; min-width:220px; animation:fi 0.12s ease; }
+.na-popover-row { display:flex; gap:5px; margin-bottom:7px; }
+.na-popover-btn { flex:1; padding:6px 4px; border:2px solid var(--border); background:var(--surface-2); font-family:var(--sans); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; cursor:pointer; transition:all 0.1s; color:var(--t2); }
+.na-popover-btn:hover { background:var(--surface-3); color:var(--t1); }
+.na-popover-btn.pop-mine    { background:#2a251f; color:#f0ebdd; border-color:#2a251f; }
+.na-popover-btn.pop-waiting { background:#2c5282; color:#fff;    border-color:#2c5282; }
+.na-popover-btn.pop-blocked { background:#b91c1c; color:#fff;    border-color:#b91c1c; }
+.na-popover input { font-size:11px; padding:5px 8px; margin-top:0; }
+
+/* ── NA PICK BUTTONS ── */
+.na-pick { flex:1; padding:7px 6px; border:2px solid var(--border); background:var(--surface-2); font-family:var(--sans); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; cursor:pointer; transition:all 0.1s; color:var(--t2); }
+.na-pick:hover { background:var(--surface-3); color:var(--t1); }
+.na-pick.active-mine    { background:#2a251f; color:#f0ebdd; border-color:#2a251f; }
+.na-pick.active-waiting { background:#2c5282; color:#fff;    border-color:#2c5282; }
+.na-pick.active-blocked { background:#b91c1c; color:#fff;    border-color:#b91c1c; }
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--surface-2); border-left: 1px solid var(--border); }
 ::-webkit-scrollbar-thumb { background: var(--t1); border: 1px solid var(--border); }
@@ -356,6 +374,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
           <button class="view-btn active" id="btnKanban" onclick="setView('kanban')">Kanban</button>
           <button class="view-btn" id="btnPriority" onclick="setView('priority')">&#9776; Priority</button>
           <button class="view-btn" id="btnPipeline" onclick="setView('pipeline')">→ Pipeline</button>
+          <button class="view-btn" id="btnArchive" onclick="setView('archive')">⏸ Archive</button>
         </div>
         <input class="search-input" id="projSearch" placeholder="Search title, journal&#8230;" oninput="renderProjects()">
       </div>
@@ -371,6 +390,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
       <div class="archived-list" id="archivedList"></div>
     </div>
 
+    <div id="archiveViewContainer" style="display:none;"><div id="archiveList"></div></div>
     <div id="pipelineViewContainer" style="display:none;">
       <div class="priority-list" id="pipelineList"></div>
     </div>
@@ -412,6 +432,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
           <option value="submitted">Submitted</option>
           <option value="revision">Revision</option>
           <option value="published">Published</option>
+          <option value="paused">Paused / Archived</option>
         </select>
       </div>
     </div>
@@ -428,6 +449,17 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); backgro
     </div>
     <div class="fg"><div class="lbl">Notes</div><textarea id="p-notes" rows="2" placeholder="Optional notes"></textarea></div>
     <div class="fg"><div class="lbl">Start date</div><input id="p-startdate" type="date" title="Used by Cowork to flag overdue projects"></div>
+    <div class="fg">
+      <div class="lbl">Next action</div>
+      <div style="display:flex;gap:6px;margin-top:4px;" id="naOwnerBtns">
+        <button type="button" class="na-pick" data-val="mine"    onclick="pickNAOwner('mine')"   >On me</button>
+        <button type="button" class="na-pick" data-val="waiting" onclick="pickNAOwner('waiting')">Waiting</button>
+        <button type="button" class="na-pick" data-val="blocked" onclick="pickNAOwner('blocked')">Blocked</button>
+        <button type="button" class="na-pick" data-val=""        onclick="pickNAOwner('')"       >—</button>
+      </div>
+      <input type="hidden" id="p-na-owner" value="">
+      <input id="p-na-context" style="margin-top:8px;" placeholder="Context — what are you waiting on / what do you need to do?">
+    </div>
     <div class="m-actions">
       <button class="btn btn-g" onclick="closeProjModal()">Cancel</button>
       <button class="btn btn-p" onclick="saveProj()">Save project</button>
@@ -576,6 +608,7 @@ const STATUS_META = {
   revision:       { label:'Revision',        cls:'s-revision' },
   submitted:      { label:'Submitted',       cls:'s-submitted' },
   published:      { label:'Published',       cls:'s-published' },
+  paused:         { label:'Paused',          cls:'s-paused' },
 };
 const TYPE_META = {
   systematic_review:   { icon:'◈', label:'Systematic Review',   color:'#a0522d', bg:'rgba(160,82,45,0.12)',   bd:'rgba(160,82,45,0.32)'   },
@@ -628,7 +661,8 @@ function personStatus(id){
   if(tp>0) return 'previous';
   return 'pending';
 }
-function activeProjects(){ return projects.filter(p=>p.status!=='published'); }
+function activeProjects(){ return projects.filter(p=>p.status!=='published'&&p.status!=='paused'); }
+function pausedProjects(){ return projects.filter(p=>p.status==='paused'); }
 function archivedProjects(){ return projects.filter(p=>p.status==='published'); }
 
 function renderStats(){
@@ -643,6 +677,7 @@ function setView(v){
   document.getElementById('btnKanban').classList.toggle('active', v==='kanban');
   document.getElementById('btnPriority').classList.toggle('active', v==='priority');
   document.getElementById('btnPipeline').classList.toggle('active', v==='pipeline');
+  document.getElementById('btnArchive').classList.toggle('active', v==='archive');
   renderProjects();
 }
 
@@ -686,6 +721,7 @@ function renderPriorityView(ap, q){
         </div>
         <div class="kc-actions" style="flex-direction:column;">
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Return to pipeline" onclick="returnToPipeline('${proj.id}')">↩</button>
+          <button class="ibtn" style="font-size:9px;padding:2px 5px;" title="Send to archive" onclick="sendToArchive('${proj.id}')">⏸</button>
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${proj.id}')">✎</button>
           <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${proj.id}')">×</button>
         </div>
@@ -750,13 +786,16 @@ function buildKanbanCard(proj,idx,total){
     <div class="kc-title">${esc(proj.title)}</div>
     ${proj.journal&&proj.journal!=='TBD'?`<div class="kc-journal">${esc(proj.journal)}</div>`:''}
     ${proj.tags?.length?`<div class="kc-tags">${proj.tags.slice(0,3).map(t=>`<span style="display:inline-block;font-size:10px;font-weight:600;font-family:var(--mono);color:var(--t2);background:var(--surface-3);border:1px solid rgba(100,116,139,0.25);border-radius:4px;padding:2px 8px;letter-spacing:0.04em;">${esc(t)}</span>`).join('')}</div>`:''}
+    ${naBadge(proj)}
     ${proj.notes?`<div style="font-size:10px;color:var(--t3);margin-bottom:7px;line-height:1.5;border-left:2px solid var(--border);padding-left:7px;">${esc(proj.notes)}</div>`:''}
     <div class="kc-footer">
       <div class="kc-team">${avatars}${moreCount}</div>
       <div style="display:flex;align-items:center;gap:6px;">
         ${slotPill}
-        <div class="kc-actions" onclick="event.stopPropagation()">
+        <div class="kc-actions" onclick="event.stopPropagation()" style="position:relative;">
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Return to pipeline" onclick="returnToPipeline('${proj.id}')">↩</button>
+          <button class="ibtn" style="font-size:9px;padding:2px 5px;" title="Send to archive" onclick="sendToArchive('${proj.id}')">⏸</button>
+          <button class="ibtn" style="font-size:9px;padding:2px 6px;" title="Next action" onclick="toggleNAPopover(event,'${proj.id}')">⚡</button>
           <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${proj.id}')">✎</button>
           <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${proj.id}')">×</button>
         </div>
@@ -772,9 +811,11 @@ function renderProjects(){
   const _pills=document.getElementById('projPills');
   if(_pills) _pills.style.display=(currentView==='kanban')?'flex':'none';
 
-  if(currentView==='priority'){ document.getElementById('pipelineViewContainer').style.display='none'; renderPriorityView(ap,q); renderArchivedSection(); return; }
+  if(currentView==='priority'){ document.getElementById('archiveViewContainer').style.display='none'; document.getElementById('pipelineViewContainer').style.display='none'; renderPriorityView(ap,q); renderArchivedSection(); return; }
   if(currentView==='pipeline'){ renderPipelineView(); return; }
+  if(currentView==='archive'){ document.getElementById('archiveViewContainer').style.display='block'; renderArchiveView(); return; }
 
+  document.getElementById('archiveViewContainer').style.display='none';
   document.getElementById('pipelineViewContainer').style.display='none';
   document.getElementById('archivedSection').style.display='';
   const board=document.getElementById('projList');
@@ -952,13 +993,19 @@ function openProjModal(id=null){
   document.getElementById('p-notes').value=p?.notes||'';
   document.getElementById('p-startdate').value=p?.startDate||'';
   initTagInput('p-tags',p?.tags||[]);
+  const _na=p?.nextAction||{};
+  document.getElementById('p-na-owner').value=_na.owner||'';
+  document.getElementById('p-na-context').value=_na.context||'';
+  pickNAOwner(_na.owner||'');
   document.getElementById('mProj').style.display='flex';
   setTimeout(()=>document.getElementById('p-title').focus(),50);
 }
 function closeProjModal(){document.getElementById('mProj').style.display='none';editProjId=null;}
 function saveProj(){
   const title=document.getElementById('p-title').value.trim();if(!title)return;
-  const d={title,type:document.getElementById('p-type').value,status:document.getElementById('p-status').value,journal:document.getElementById('p-journal').value.trim(),capacity:parseInt(document.getElementById('p-capacity').value)||4,notes:document.getElementById('p-notes').value.trim(),startDate:document.getElementById('p-startdate').value||'',tags:getTagsFromInput('p-tags')};
+  const _naO=document.getElementById('p-na-owner').value;
+  const _naC=document.getElementById('p-na-context').value.trim();
+  const d={title,type:document.getElementById('p-type').value,status:document.getElementById('p-status').value,journal:document.getElementById('p-journal').value.trim(),capacity:parseInt(document.getElementById('p-capacity').value)||4,notes:document.getElementById('p-notes').value.trim(),startDate:document.getElementById('p-startdate').value||'',tags:getTagsFromInput('p-tags'),nextAction:{owner:_naO,context:_naC}};
   // Auto-set publish year when status is published
   if(d.status==='published'){
     const existingProj=editProjId?projects.find(p=>p.id===editProjId):null;
@@ -1141,7 +1188,9 @@ function exportAll(){
   const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`research-roster.json`;a.click();
 }
+document.addEventListener('click', ()=>closeNAPopover());
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeNAPopover();
   if(e.key!=='Escape')return;
   ['mProj','mPerson','mProfile','mAssign','mPipeline','mConfirm','mProjDetail'].forEach(id=>document.getElementById(id).style.display='none');
   editProjId=null;editPersonId=null;profilePersonId=null;
@@ -1155,6 +1204,7 @@ function togglePipeline(){} // pipeline now lives in view tab
 function renderPipelineView(){
   document.getElementById('projList').innerHTML='';
   document.getElementById('archivedSection').style.display='none';
+  document.getElementById('archiveViewContainer').style.display='none';
   document.getElementById('pipelineViewContainer').style.display='block';
   renderPipeline();
 }
@@ -1162,6 +1212,8 @@ function renderPipelineView(){
 function renderPipeline(){
   const btn=document.getElementById('btnPipeline');
   if(btn) btn.textContent=`→ Pipeline${pipeline.length?' ('+pipeline.length+')':''}`;
+  const _ab=document.getElementById('btnArchive');
+  if(_ab){ const _pc=pausedProjects().length; _ab.textContent=_pc?`⏸ Archive (${_pc})`:'⏸ Archive'; }
   if(!pipeline.length){
     document.getElementById('pipelineList').innerHTML=`<div class="empty-state"><strong>No pipeline entries</strong>Add potential projects you want to follow up on.</div>`;
     return;
@@ -1335,7 +1387,142 @@ async function returnToPipeline(projId){
   if(!pipelineOpenState) togglePipeline();
   renderAll();
 }
+
+// ── NA POPOVER ────────────────────────────────────────────────────────────────
+let _naPopoverProjId = null;
+
+function toggleNAPopover(e, projId){
+  e.stopPropagation();
+  // If same button clicked again, close
+  if(_naPopoverProjId === projId){ closeNAPopover(); return; }
+  closeNAPopover();
+  _naPopoverProjId = projId;
+  const proj = projects.find(p=>p.id===projId); if(!proj) return;
+  const na = proj.nextAction || {};
+  const popId = 'na-pop-' + projId;
+
+  const html = `<div class="na-popover" id="${popId}" onclick="event.stopPropagation()">
+    <div class="na-popover-row">
+      <button class="na-popover-btn${na.owner==='mine'?' pop-mine':''}"    onclick="setNAQuick('${projId}','mine')"   >On me</button>
+      <button class="na-popover-btn${na.owner==='waiting'?' pop-waiting':''}" onclick="setNAQuick('${projId}','waiting')">Waiting</button>
+      <button class="na-popover-btn${na.owner==='blocked'?' pop-blocked':''}" onclick="setNAQuick('${projId}','blocked')">Blocked</button>
+      <button class="na-popover-btn${!na.owner?' pop-none':''}" style="${!na.owner?'background:var(--surface-3);color:var(--t1);border-color:var(--border);':''}" onclick="setNAQuick('${projId}','')">—</button>
+    </div>
+    <input id="na-ctx-${projId}" placeholder="Context…" value="${esc(na.context||'')}" oninput="setNAContext('${projId}',this.value)" onclick="event.stopPropagation()">
+  </div>`;
+
+  // Append into the kc-actions div
+  const actionsDiv = e.currentTarget.closest('.kc-actions');
+  if(actionsDiv){ actionsDiv.insertAdjacentHTML('beforeend', html); }
+}
+
+function closeNAPopover(){
+  if(_naPopoverProjId){
+    const el = document.getElementById('na-pop-' + _naPopoverProjId);
+    if(el) el.remove();
+    _naPopoverProjId = null;
+  }
+}
+
+function setNAQuick(projId, owner){
+  const proj = projects.find(p=>p.id===projId); if(!proj) return;
+  if(!proj.nextAction) proj.nextAction = {};
+  proj.nextAction.owner = owner;
+  saveProjects();
+  // Re-render card in place without closing popover
+  const card = document.getElementById('pc-' + projId);
+  if(card){
+    const newCard = document.createElement('div');
+    newCard.innerHTML = buildKanbanCard(proj, 0, 1);
+    const built = newCard.firstElementChild;
+    card.parentNode.replaceChild(built, card);
+  }
+  // Reopen popover on new card
+  _naPopoverProjId = null;
+  const newActionsDiv = document.querySelector('#pc-' + projId + ' .kc-actions');
+  if(newActionsDiv){
+    const fakeBtn = newActionsDiv.querySelector('[title="Next action"]');
+    if(fakeBtn) toggleNAPopover({stopPropagation:()=>{}, currentTarget:fakeBtn}, projId);
+  }
+}
+
+function setNAContext(projId, val){
+  const proj = projects.find(p=>p.id===projId); if(!proj) return;
+  if(!proj.nextAction) proj.nextAction = {};
+  proj.nextAction.context = val;
+  saveProjects();
+}
+
+// ── NA BADGE & PICKER ──────────────────────────────────────────────────────
+const NA_CFG = {
+  mine:    { label:'On me',   fg:'#fdfbf7', bg:'#2a251f', border:'#2a251f' },
+  waiting: { label:'Waiting', fg:'#ffffff', bg:'#2c5282', border:'#2c5282' },
+  blocked: { label:'Blocked', fg:'#ffffff', bg:'#b91c1c', border:'#b91c1c' },
+};
+function naBadge(proj){
+  const na=proj.nextAction; if(!na||!na.owner) return '';
+  const m=NA_CFG[na.owner]; if(!m) return '';
+  const ctx=na.context?`<span style="font-size:10px;color:rgba(255,255,255,0.75);font-style:italic;margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;" title="${esc(na.context)}">${esc(na.context)}</span>`:'';
+  return `<div style="display:inline-flex;align-items:center;margin-bottom:9px;padding:4px 10px;background:${m.bg};border:1px solid ${m.border};max-width:100%;overflow:hidden;"><span style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${m.fg};font-family:var(--sans);white-space:nowrap;">${m.label}</span>${ctx}</div>`;
+}
+function pickNAOwner(val){
+  const hidden=document.getElementById('p-na-owner'); if(hidden) hidden.value=val;
+  document.querySelectorAll('.na-pick').forEach(b=>{
+    const v=b.dataset.val;
+    const active=v===val;
+    const m=NA_CFG[v];
+    if(active&&m){
+      b.style.background=m.bg; b.style.color=m.fg; b.style.borderColor=m.border;
+    } else {
+      b.style.background='var(--surface-2)'; b.style.color='var(--t2)'; b.style.borderColor='var(--border)';
+    }
+  });
+}
+
+// ── ARCHIVE ────────────────────────────────────────────────────────────────
+function sendToArchive(projId){
+  const proj=projects.find(p=>p.id===projId); if(!proj) return;
+  proj.status='paused'; saveProjects(); renderAll(); setView('archive');
+}
+function reactivateProject(projId){
+  openProjModal(projId);
+  setTimeout(()=>{ document.getElementById('p-status').value='writing'; },60);
+}
+function renderArchiveView(){
+  document.getElementById('projList').innerHTML='';
+  document.getElementById('archivedSection').style.display='none';
+  document.getElementById('pipelineViewContainer').style.display='none';
+  document.getElementById('archiveViewContainer').style.display='block';
+  const q=document.getElementById('projSearch').value.toLowerCase();
+  const paused=pausedProjects().filter(p=>!q||p.title.toLowerCase().includes(q)||(p.journal||'').toLowerCase().includes(q));
+  if(!paused.length){
+    document.getElementById('archiveList').innerHTML=`<div class="empty-state"><strong>Archive is empty</strong>Send paused projects here \u2014 they won\u2019t count toward active or open slots.</div>`;
+    return;
+  }
+  document.getElementById('archiveList').innerHTML=`<div class="kanban-board" style="flex-wrap:wrap;">${paused.map(proj=>{
+    const tm=TYPE_META[proj.type]||{icon:'\u25c7',label:proj.type,color:'var(--t3)',bg:'transparent',bd:'var(--border)'};
+    const team=proj.team.map(id=>people.find(p=>p.id===id)).filter(Boolean);
+    const avatars=team.slice(0,5).map(per=>`<div class="kc-avatar" style="background:${personColor(per.id)};" title="${esc(per.name)}" onclick="event.stopPropagation();openProfile('${per.id}')">${esc(initials(per.name))}</div>`).join('');
+    const na=naBadge(proj);
+    return `<div class="kanban-card archived-card" style="flex:0 0 300px;min-width:300px;cursor:pointer;" onclick="openProjDetail('${proj.id}')">
+      <div class="kc-type" style="color:${tm.color};background:${tm.bg};border:1px solid ${tm.bd};border-radius:4px;padding:2px 8px;display:inline-flex;align-items:center;gap:4px;font-weight:700;margin-bottom:8px;">${tm.icon} ${esc(tm.label)}</div>
+      <div class="kc-title" style="margin-bottom:6px;">${esc(proj.title)}</div>
+      ${proj.journal?`<div class="kc-journal">${esc(proj.journal)}</div>`:''}
+      ${na}
+      <div class="kc-footer">
+        <div class="kc-team">${avatars}</div>
+        <div class="kc-actions" onclick="event.stopPropagation()">
+          <button class="ibtn ibtn-g" style="font-size:9px;padding:3px 8px;font-weight:700;" onclick="reactivateProject('${proj.id}')">\u21a9 Reactivate</button>
+          <button class="ibtn" style="font-size:9px;padding:2px 6px;" onclick="openProjModal('${proj.id}')">\u270e</button>
+          <button class="ibtn ibtn-r" style="font-size:9px;padding:2px 5px;" onclick="deleteProj('${proj.id}')">\u00d7</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
 function renderAll(){renderStats();renderProjects();renderPeople();renderPipeline();}
+
 
 // ── SUNDAY AUTO-EXPORT ────────────────────────────────────────────────────────
 function sundayAutoExport(){
